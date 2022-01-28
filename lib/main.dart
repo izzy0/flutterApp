@@ -1,15 +1,10 @@
 import 'dart:async';
-// import 'dart:ffi';
-// import 'dart:js';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-// import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 void main() {
   runApp(const MyApp());
 }
-
-
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -17,12 +12,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter xx ',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(),
+    return const MaterialApp(
+      home: MyHomePage(),
     );
   }
 }
@@ -35,39 +26,43 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // intial loaded URL
-final webViewReload = GlobalKey<ChangeRouteState>();
-String routeUrl = 'https://www.socialbite.co/login';
-String newURL = "";
+  final webViewReload = GlobalKey<ChangeRouteState>();
+  bool showLogout = false;
+  bool isLoggedIn = false;
 
-  // void _buttonPree(BuildContext context, String newURL){
-  //   Navigator.push(context,
-  //     MaterialPageRoute( builder: (context) => ChangeRoute(newURL)));
-  // }
-
-  void routeChanger() {
-    print("routeURL Now: $newURL");
-    webViewReload.currentState?.reloadPage(newURL);
-    print("routeURL $routeUrl");
-    // setState(() {
-    //   print("route URL: $routeUrl");
-
-    //   // Navigator.push(
-    //   //     context,
-    //   //     MaterialPageRoute(
-    //   //         builder: (BuildContext context) =>
-    //   //             ChangeRoute(routeUrl: routeUrl,)));
-    // });
+  Widget showLogoutButton() {
+    if (showLogout) {
+      return Row(
+        children: [
+          const SizedBox(
+            width: 30.0,
+          ),
+          TextButton(
+              onPressed: () {
+                webViewReload.currentState
+                    ?.reloadPage('https://socialbite.co/logout/');
+                webViewReload.currentState
+                    ?.reloadPage('https://socialbite.co/login/');
+                // Navigator.pop(context);
+              },
+              child: const Text("Logout"))
+        ],
+      );
+    } else {
+      return const SizedBox(
+        width: 0,
+        height: 0,
+      );
+    }
   }
 
-  // TODO make all strings a final variable
   // TODO move styles to styles file
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           toolbarHeight: 50,
-          iconTheme: IconThemeData(color: Colors.black54),
+          iconTheme: const IconThemeData(color: Colors.black54),
           backgroundColor: Colors.white70,
           shadowColor: Colors.grey[50],
           centerTitle: false,
@@ -85,51 +80,96 @@ String newURL = "";
         ),
         endDrawer: Drawer(
           backgroundColor: Colors.blueGrey[50],
-          child: Container(
-            padding: const EdgeInsets.only(top: 100.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                TextButton.icon(
-                  onPressed: () {
-                    webViewReload.currentState?.reloadPage('https://www.socialbite.co');
-                  },
-                  icon: Icon(Icons.account_circle),
-                  label: Text("Profile"),
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: const BoxDecoration(color: Colors.white70),
+                child: Image.asset(
+                  // TODO change image to SVG
+                  'assets/images/logo.png',
+                  fit: BoxFit.contain,
+                  height: 32,
                 ),
-                TextButton.icon(
-                  onPressed: () {
-                    newURL = 'https://www.socialbite.co';
-                    routeChanger();
-                  },
-                  icon: Icon(Icons.settings),
-                  label: Text("Settings"),
-                ),
-                TextButton.icon(
-                  onPressed: null,
-                  icon: Icon(Icons.help_rounded),
-                  label: Text("Support"),
-                ),
-              ],
-            ),
+              ),
+              Visibility(
+                  visible: isLoggedIn,
+                  child: Column(
+                    children: [
+                      ListTile(
+                        title: const Text("Profle"),
+                        leading: const Icon(Icons.account_circle),
+                        onTap: () {
+                          if (isLoggedIn) {
+                            webViewReload.currentState
+                                ?.reloadPage('https://www.socialbite.co/user');
+                          } else {
+                            webViewReload.currentState
+                                ?.reloadPage('https://www.socialbite.co/login');
+                          }
+
+                          showLogout = false;
+                          Navigator.pop(context);
+                        },
+                      ),
+                      const Divider(),
+                    ],
+                  )),
+              Visibility(
+                  visible: isLoggedIn,
+                  child: Column(
+                    children: [
+                      ListTile(
+                        title: const Text("Settings"),
+                        leading: const Icon(Icons.settings),
+                        onTap: () {
+                          webViewReload.currentState
+                              ?.reloadPage('https://socialbite.co/account/');
+                          showLogout = true;
+                          Navigator.pop(context);
+                        },
+                      ),
+                      const Divider(),
+                    ],
+                  )),
+              ListTile(
+                title: const Text("Products"),
+                leading: const Icon(Icons.shopping_bag_rounded),
+                onTap: () {
+                  webViewReload.currentState
+                      ?.reloadPage('https://socialbite.co/order-product/');
+                  showLogout = false;
+                  Navigator.pop(context);
+                },
+              ),
+              const Divider(),
+              ListTile(
+                title: const Text("Support"),
+                leading: const Icon(Icons.help_rounded),
+                onTap: () {
+                  webViewReload.currentState
+                      ?.reloadPage('https://socialbite.co/contact/');
+                  showLogout = false;
+                  Navigator.pop(context);
+                },
+              )
+            ],
           ),
         ),
-        body: const ChangeRoute(
-            // routeUrl: routeUrl,
-            ));
+        body: Column(
+          children: [
+            Expanded(
+              child: ChangeRoute(key: webViewReload),
+              flex: 12,
+            ),
+            Expanded(
+              child: showLogoutButton(),
+              flex: (showLogout ? 1 : 0),
+            )
+          ],
+        ));
   }
 }
-
-// JavascriptChannel _toasterJavascriptChannel(BuildContext context) {
-//   return JavascriptChannel(
-//       name: 'Toaster',
-//       onMessageReceived: (JavascriptMessage message) {
-//         // ignore: deprecated_member_use
-//         Scaffold.of(context).showSnackBar(
-//           SnackBar(content: Text(message.message)),
-//         );
-//       });
-// }
 
 class ChangeRoute extends StatefulWidget {
   const ChangeRoute({Key? key}) : super(key: key);
@@ -144,10 +184,7 @@ class ChangeRouteState extends State<ChangeRoute> {
 
   late WebViewController _webViewController;
 
-  // final Function() refresh;
   String routeUrl = 'https://www.socialbite.co/login';
-  // ChangeRoute({Key? key, required this.refresh}) : super(key: key);
-  // ChangeRoute({Key? key, required this.routeUrl}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -162,19 +199,23 @@ class ChangeRouteState extends State<ChangeRoute> {
       onProgress: (int progress) {
         print("webview is loading: $progress%");
       },
-      // javascriptChannels: <JavascriptChannel>{
-      //   _toasterJavascriptChannel(context),
-      // },
-      // navigationDelegate: (NavigationRequest request) {
-      //   if (request.url.contains('socialbite.co/user')) {
-      //     return NavigationDecision.navigate;
-      //   }
-      //   return NavigationDecision.prevent;
-      // },
       onPageStarted: (String url) {
         print('Page started loading: $url');
       },
       onPageFinished: (String url) {
+        // If user is not logged in
+        // login user
+        // if (true) {
+        //   print("logging in");
+        //   _webViewController.runJavascript("javascript:(function() { " +
+        //       " var email = document.getElementById('user_email-70');" +
+        //       "var password = document.getElementById('user_password-70');" +
+        //       // "document.getElementById('checkbox').checked = true;"+ 
+        //       "email.value = 'izharrosman@gmail.com';" +
+        //       "password.value = '1p5Hmwp9dt!D';" +
+        //       "document.getElementById('um-submit-btn').click();"
+        //           "})()");
+        // }
         print('Page finished loading: $url');
         _webViewController
             .runJavascriptReturningResult("javascript:(function() { " +
@@ -190,11 +231,11 @@ class ChangeRouteState extends State<ChangeRoute> {
     );
   }
 
-  void reloadPage( String newURL) {
-    print("reload");
+  void reloadPage(String newURL) {
+    print("------reload $newURL");
     setState(() {
       routeUrl = newURL;
     });
-    _webViewController.reload();
+    _webViewController.loadUrl(newURL);
   }
 }
