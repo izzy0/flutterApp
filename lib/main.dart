@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+
 // appbar and drawer are removed in app basic
 void main() {
   runApp(const MyApp());
@@ -12,7 +14,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return  const MaterialApp(
       home: MyHomePage(),
     );
   }
@@ -86,8 +88,13 @@ class _MyHomePageState extends State<MyHomePage> {
   // TODO move styles to styles file Body is
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(
+      statusBarColor: Colors.transparent, // Color for Android
+      statusBarBrightness: Brightness.light,// Dark == white status bar -- for IOS.
+       statusBarIconBrightness: Brightness.dark,
+    ));
     return Scaffold(
-body: Column(
+        body: Column(
           children: [
             const SizedBox(
               height: 40.0,
@@ -133,10 +140,10 @@ class ChangeRouteState extends State<ChangeRoute> {
         _controller.complete(webViewController);
       },
       navigationDelegate: (NavigationRequest request) {
-        print("--- is equal to url : " + request.url == ('https://socialbite.co/'));
-        if (request.url == ('https://socialbite.co/')){
+        print("--- is equal to url : " + request.url ==
+            ('https://socialbite.co/'));
+        if (request.url == ('https://socialbite.co/')) {
           return NavigationDecision.prevent;
-        
         }
         return NavigationDecision.navigate;
       },
@@ -153,7 +160,7 @@ class ChangeRouteState extends State<ChangeRoute> {
         // login user
         currentUrl = url;
         // _getCurrentUrl();
-        // TODO check url if it is not login 
+        // TODO check url if it is not login
         // if(!areYouLoggedIn()){
         //   clearCache();
         // }
@@ -187,7 +194,7 @@ class ChangeRouteState extends State<ChangeRoute> {
       },
       gestureNavigationEnabled: true,
     );
-  }       
+  }
 
   void reloadPage(String newURL) {
     print("------reload $newURL");
@@ -197,7 +204,7 @@ class ChangeRouteState extends State<ChangeRoute> {
     _webViewController.loadUrl(newURL);
   }
 
-// Always gets submitted twice 
+// Always gets submitted twice
   Future<void> _getCurrentUrl() async {
     setState(() async {
       currentUrl = (await _webViewController.currentUrl())!;
