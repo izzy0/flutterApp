@@ -172,8 +172,8 @@ class ChangeRouteState extends State<ChangeRoute> {
                   " var email = document.getElementById('user_email-70');" +
                   "var password = document.getElementById('user_password-70');" +
                   // "document.getElementById('checkbox').checked = true;"+
-                  "email.value = 'izharrosman@gmail.com';" +
-                  "password.value = '1p5Hmwp9dt!D';" +
+                 // "email.value = '<email>';" +
+                  //"password.value = '<pass>';" +
                   "document.getElementById('um-submit-btn').click();"
                       "})()")
               .catchError((onError) => debugPrint('$onError'));
