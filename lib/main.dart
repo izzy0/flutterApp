@@ -215,7 +215,14 @@ class ChangeRouteState extends State<ChangeRoute> {
     print("-- {} {} -- current url : $currentUrl");
 
     setState(() {
-      loggedIn = !currentUrl.contains("login");
+      // if( currentUrl.contains("login") ){
+        loggedIn = !currentUrl.contains("login");
+      // }
+      // if( currentUrl.contains("logout") ){
+      //   loggedIn = !currentUrl.contains("logout");
+      // } else {
+      //   loggedIn = true;
+      // }
     });
     print("------->>> areyouLoggeding webview: $loggedIn");
     return loggedIn;

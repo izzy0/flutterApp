@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.socialbite">
+    package="com.izhar.socialbite">
    <application
-        android:label="socialbite"
+        android:label="Socialbite"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
