@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // appbar and drawer are removed in app basic
 void main() {
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return  const MaterialApp(
+    return const MaterialApp(
       home: MyHomePage(),
     );
   }
@@ -32,14 +33,14 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     // DO YOUR STUFF
-    new Future<String>.delayed(Duration(seconds: 2), () => '["call back"]')
-        .then((String value) {
-      print("+++++ FUTURE CALL FINISHED");
+    // new Future<String>.delayed(Duration(seconds: 2), () => '["call back"]')
+    //     .then((String value) {
+    //   print("+++++ FUTURE CALL FINISHED");
 
       setState(() {
         areYouLoggedIn();
       });
-    });
+    // });
   }
 
   var webViewReload = GlobalKey<ChangeRouteState>();
@@ -90,25 +91,27 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(
       statusBarColor: Colors.transparent, // Color for Android
-      statusBarBrightness: Brightness.light,// Dark == white status bar -- for IOS.
-       statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness:
+          Brightness.light, // Dark == white status bar -- for IOS.
+      statusBarIconBrightness: Brightness.dark,
     ));
     return Scaffold(
-        body: Column(
-          children: [
-            const SizedBox(
-              height: 40.0,
-            ),
-            Expanded(
-              child: ChangeRoute(key: webViewReload),
-              flex: 12,
-            ),
-            Expanded(
-              child: showLogoutButton(),
-              flex: (showLogout ? 1 : 0),
-            )
-          ],
-        ));
+      body: Column(
+        children: [
+          const SizedBox(
+            height: 40.0,
+          ),
+          Expanded(
+            child: ChangeRoute(key: webViewReload),
+            flex: 12,
+          ),
+          // Expanded(
+          //   child: showLogoutButton(),
+          //   flex: (showLogout ? 1 : 0),
+          // )
+        ],
+      ),
+    );
   }
 }
 
@@ -142,6 +145,14 @@ class ChangeRouteState extends State<ChangeRoute> {
       navigationDelegate: (NavigationRequest request) {
         print("--- is equal to url : " + request.url ==
             ('https://socialbite.co/'));
+
+        // if (request.url.contains("mailto:")) {
+        //   launch(request.url);
+        //   return NavigationDecision.prevent;
+        // } else if (request.url.contains("tel:")) {
+        //   launch(request.url);
+        //   return NavigationDecision.prevent;
+        // }
         if (request.url == ('https://socialbite.co/')) {
           return NavigationDecision.prevent;
         }
@@ -161,23 +172,24 @@ class ChangeRouteState extends State<ChangeRoute> {
         currentUrl = url;
         // _getCurrentUrl();
         // TODO check url if it is not login
-        // if(!areYouLoggedIn()){
+        // if (!areYouLoggedIn()) {
         //   clearCache();
         // }
-        if (!areYouLoggedIn()) {
-          print("-->>> logging in $url");
-          loggedIn = true;
-          _webViewController
-              .runJavascriptReturningResult("javascript:(function() { " +
-                  " var email = document.getElementById('user_email-70');" +
-                  "var password = document.getElementById('user_password-70');" +
-                  // "document.getElementById('checkbox').checked = true;"+
-                 // "email.value = '<email>';" +
-                  //"password.value = '<pass>';" +
-                  "document.getElementById('um-submit-btn').click();"
-                      "})()")
-              .catchError((onError) => debugPrint('$onError'));
-        }
+// TODO AUTO LOGIN IF YOU ARE NOT LOGGED IN 
+        // if (!areYouLoggedIn()) {
+        //   print("-->>> logging in $url");
+        //   loggedIn = true;
+        //   _webViewController
+        //       .runJavascriptReturningResult("javascript:(function() { " +
+        //           " var email = document.getElementById('user_email-70');" +
+        //           "var password = document.getElementById('user_password-70');" +
+        //           // "document.getElementById('checkbox').checked = true;"+
+        //           // "email.value = '<email>';" +
+        //           // "password.value = '<pass>';" +
+        //           "document.getElementById('um-submit-btn').click();"
+        //               "})()")
+        //       .catchError((onError) => debugPrint('$onError'));
+        // }
         // TODO see whats in webview contrller
         print('Page finished loading: $url');
         // currentUrl = (await _webViewController.currentUrl())!;
@@ -216,7 +228,7 @@ class ChangeRouteState extends State<ChangeRoute> {
 
     setState(() {
       // if( currentUrl.contains("login") ){
-        loggedIn = !currentUrl.contains("login");
+      loggedIn = !currentUrl.contains("login");
       // }
       // if( currentUrl.contains("logout") ){
       //   loggedIn = !currentUrl.contains("logout");
@@ -230,7 +242,7 @@ class ChangeRouteState extends State<ChangeRoute> {
 
   void clearCache() {
     print("--- -------- ---------- --------- cleared cache");
-    // _webViewController.clearCache();
+    _webViewController.clearCache();
 
     reloadPage('https://socialbite.co/logout/');
 
